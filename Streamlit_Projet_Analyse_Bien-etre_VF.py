@@ -146,17 +146,34 @@ df_processed, df_original = load_and_preprocess_data()
 st.session_state['df_processed'] = df_processed
 st.session_state['df_original'] = df_original
 
+
+# Base df avec code ID & Pays
+df = pd.read_csv(FILE_PATH_WHR, sep=',')
+# Add 'id' column for merging
+df['year'] = df['year'].astype('str')
+df['id'] = df['year'] + "-" + df['Country name']
+# Load ID base
+ID = pd.read_csv(FILE_PATH_MERGE_ID, sep=';')
+# Merge df & ID base
+merge_df_ISO = ID.merge(df, on='id', how='outer')
+merge_df_ISO = merge_df_ISO.drop(columns=['Country name_y', 'year_y'])
+merge_df_ISO = merge_df_ISO.rename(columns={'year_x': 'year', 'Country name_x': 'Country name'})
+
+
+
 # --- Fonctions pour chaque "page" ---
 
-def home_page():
+def home_page(): 
 
     st.title("🌍 Projet Analyse du bien-être sur Terre - Data Analyse - Feb25 Continu")
-    
-    st.subheader("Présentation du sujet, du problème et des enjeux")
-
-    st.markdown("""**🌟 Projet présenté par Elsa Riché, Mathilde Leygnac et Grégory Six.**""")
 
     st.markdown("---")
+
+    st.image('STREAMLIT-Couv.jpg')
+
+
+    st.markdown("---")
+    st.subheader(" 🌟 Présentation du sujet, du problème et des enjeux")
     st.markdown(" ##### Dans ce projet nous allons effectuer une analyse approfondie des données collectées par le World Happiness Report mené par l’Organisation des Nations Unies.")
     
     st.markdown("""
@@ -440,19 +457,28 @@ def pre_processing():
     """)
 
     st.markdown("---")
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.subheader("1.1 Données Originales : valeurs manquantes")
+        st.subheader("1.1 Données Originales")
         st.write(f"Nombre de lignes dataframe 2005-2020 : **{len(df_original)}**")
         st.write(f"Nombre de colonnes : **{df_original.shape[1]}**")
         st.write(f"Nombre total de valeurs manquantes originales : **{df_original.isna().sum().sum()}**")
         total_nan_original = df_original.isna().sum().sum()
         st.write(f"Pourcentage de valeurs manquantes originales : **{round((total_nan_original / (WHR_2005_2020.shape[0] * WHR_2005_2020.shape[1])) * 100, 2)}%**")
         st.dataframe(df_original.isna().sum().rename("NaN Count").reset_index().rename(columns={'index': 'Column'}))
-
+    
     with col2:
-        st.subheader("1.2 Données Prétraitées et Enrichies")
+        st.subheader("1.2 Données avec code ID & Pays")
+        st.write(f"Nombre de lignes dataframe 2005-2020 : **{len(merge_df_ISO)}**")
+        st.write(f"Nombre de colonnes : **{merge_df_ISO.shape[1]}**")
+        st.write(f"Nombre total de valeurs manquantes originales : **{merge_df_ISO.isna().sum().sum()}**")
+        total_nan_merge = merge_df_ISO.isna().sum().sum()
+        st.write(f"Pourcentage de valeurs manquantes originales : **{round((total_nan_merge / (merge_df_ISO.shape[0] * merge_df_ISO.shape[1])) * 100, 2)}%**")
+        st.dataframe(merge_df_ISO.isna().sum().rename("NaN Count").reset_index().rename(columns={'index': 'Column'}))
+
+    with col3:
+        st.subheader("1.3 Données Prétraitées et Enrichies")
         st.write(f"Nombre de lignes après traitement : **{df_processed.shape[0]}**")
         st.write(f"Nombre de colonnes après traitement : **{df_processed.shape[1]}**")
         total_nan_processed = df_processed.isna().sum().sum()
@@ -461,7 +487,7 @@ def pre_processing():
         st.dataframe(df_processed.isna().sum().rename("NaN Count").reset_index().rename(columns={'index': 'Column'}))
 
     st.markdown("---")
-    st.subheader("1.3 Aperçu de notre dataset final")
+    st.subheader("1.4 Aperçu de notre dataset final")
 
     st.write("Le dataset a été fusionné avec des données supplémentaires et les valeurs manquantes ont été traitées. En voici les premières lignes :")
 
