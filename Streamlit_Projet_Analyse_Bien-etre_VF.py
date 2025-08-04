@@ -237,7 +237,8 @@ def presentation_donnees():
     st.write(f"Nombre total de valeurs manquantes : **{WHR_2005_2020.isna().sum().sum()}**")
     st.dataframe(WHR_2005_2020.head())
 
-
+    info_2005_2020 = WHR_2005_2020.info
+    st.text(info_2005_2020)
 
     st.dataframe(WHR_2005_2020.describe())
 
@@ -608,3 +609,4 @@ elif page_selection == "Analyse des Tendances":
 elif page_selection == "Matrice de corrélation":
 
     correlations()
+
