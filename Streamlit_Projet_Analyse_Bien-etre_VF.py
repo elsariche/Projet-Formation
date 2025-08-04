@@ -244,6 +244,7 @@ def presentation_donnees():
     with redirect_stdout(sys.stdout) as stdout:
         WHR_2005_2020.info()
         info_str = stdout.getvalue()
+    st.text(info_str)
 
     st.dataframe(WHR_2005_2020.describe())
 
@@ -614,5 +615,6 @@ elif page_selection == "Analyse des Tendances":
 elif page_selection == "Matrice de corrélation":
 
     correlations()
+
 
 
