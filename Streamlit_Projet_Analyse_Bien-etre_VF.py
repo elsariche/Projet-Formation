@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import io
 
 # --- Configuration de la page ---
 st.set_page_config(layout="wide", page_title="Analyse du World Happiness Report", page_icon="🌍",  initial_sidebar_state="expanded")
@@ -237,14 +237,10 @@ def presentation_donnees():
     st.write(f"Nombre total de valeurs manquantes : **{WHR_2005_2020.isna().sum().sum()}**")
     st.dataframe(WHR_2005_2020.head())
 
-    info_2005_2020 = WHR_2005_2020.info
-    st.text(info_2005_2020)
-    
-    info_str = ""
-    with redirect_stdout(sys.stdout) as stdout:
-        WHR_2005_2020.info()
-        info_str = stdout.getvalue()
-    st.text(info_str)
+    with st.expander("**Afficher les informations détaillées du DataFrame 2005-2020**"):
+        buffer = io.StringIO()
+        WHR_2005_2020.info(buf=buffer)
+        st.text(buffer.getvalue())
 
     st.dataframe(WHR_2005_2020.describe())
 
@@ -255,7 +251,10 @@ def presentation_donnees():
     st.write(f"Nombre total de valeurs manquantes : **{WHR_2021.isna().sum().sum()}**")
     st.dataframe(WHR_2021.head())
     
-
+    with st.expander("**Afficher les informations détaillées du DataFrame 2021**"):
+        buffer = io.StringIO()
+        WHR_2021.info(buf=buffer)
+        st.text(buffer.getvalue())
 
     st.dataframe(WHR_2021.describe())
 
@@ -613,8 +612,4 @@ elif page_selection == "Pré Processing des données":
 elif page_selection == "Analyse des Tendances":
     analyse_des_tendances_page()
 elif page_selection == "Matrice de corrélation":
-
     correlations()
-
-
-
